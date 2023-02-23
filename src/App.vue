@@ -1,8 +1,14 @@
 <template>
-<div class="app">
-<post-form @create="createPost"/>
-<post-list :posts="posts"/>
-</div>
+    <div class="app">
+        <my-button class="btn-create"
+        @click="showDialog"
+        >Create post</my-button>
+        <my-dialog v-model:show="dialogVisible">
+            <post-form @create="createPost"/>
+        </my-dialog>
+        <post-list :posts="posts"
+         @remove="removePost"/>
+    </div>
 </template>
 
 <script>
@@ -17,11 +23,18 @@ export default {
         return {
             posts: [
             ],
+            dialogVisible: false,
         }
     },
     methods: {
         createPost(post) {
             this.posts.push(post)
+        },
+        removePost(post) {
+            this.posts = this.posts.filter(p => p.id !== post.id)
+        },
+        showDialog() {
+            this.dialogVisible = true
         }
     }
 
@@ -38,5 +51,12 @@ export default {
     padding: 40px;
     width: 600px;
     margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+.btn-create {
+    width:25%;
+    margin: 15px;
+    align-self: flex-end;
 }
 </style>

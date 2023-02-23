@@ -6,7 +6,8 @@
             <div><strong>Text:</strong> {{ post.body }}</div>
         </div>
         <div class="btns">
-            <my-button class="btn-del">
+            <my-button class="btn-del"
+            @click="$emit('remove', post)">
                 DELETE
             </my-button>
         </div>
