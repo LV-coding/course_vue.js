@@ -14,6 +14,7 @@
 <script>
 import PostList from '@/components/PostList.vue';
 import PostForm from '@/components/PostForm.vue'; 
+import axios from 'axios';
 
 export default {
     components: {
@@ -35,7 +36,18 @@ export default {
         },
         showDialog() {
             this.dialogVisible = true
+        },
+        async fetchPosts() {
+            try {
+                const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=20');
+                this.posts = response.data;
+            } catch (e) {
+                alert(e)
+            }
         }
+    },
+    mounted() {
+        this.fetchPosts()
     }
 
 }
@@ -55,7 +67,7 @@ export default {
     flex-direction: column;
 }
 .btn-create {
-    width:25%;
+    width:35%;
     margin: 15px;
     align-self: flex-end;
 }
