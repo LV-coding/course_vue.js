@@ -7,7 +7,10 @@
             <post-form @create="createPost"/>
         </my-dialog>
         <post-list :posts="posts"
-         @remove="removePost"/>
+         @remove="removePost"
+         v-if="!isPostLoading"/>
+         <div v-else>Posts loading...</div>
+         <div class="endPage" ref="endPage"></div>
     </div>
 </template>
 
@@ -22,9 +25,12 @@ export default {
     },
     data() {
         return {
-            posts: [
-            ],
+            posts: [],
             dialogVisible: false,
+            isPostLoading: false,
+            postsPage: 1,
+            postsLimit: 10,
+            totalPages: 0
         }
     },
     methods: {
@@ -39,17 +45,49 @@ export default {
         },
         async fetchPosts() {
             try {
-                const response = await axios.get('https://jsonplaceholder.typicode.com/posts?_limit=20');
-                this.posts = response.data;
+                this.isPostLoading = true;
+                const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+                    params: {
+                        _page: this.postsPage,
+                        _limit: this.postsLimit,
+                    }
+                });
+                this.totalPages = Math.ceil(response.headers['x-total-count'] / this.postsLimit)
+                this.posts = [...this.posts, ...response.data];
             } catch (e) {
                 alert(e)
+            } finally {
+                this.isPostLoading = false;
             }
+        },
+        async fetchMorePosts() {
+            try {
+                this.postsPage += 1
+                const response = await axios.get('https://jsonplaceholder.typicode.com/posts', {
+                    params: {
+                        _page: this.postsPage,
+                        _limit: this.postsLimit,
+                    }
+                });
+                this.posts = [...this.posts, ...response.data];
+            } catch (e) {
+                alert(e)
+            } 
         }
     },
     mounted() {
         this.fetchPosts()
-    }
 
+        let options = {rootMargin: '0px', threshold: 1.0}
+        let callback = (entries, observer) => {
+            if(entries[0].isIntersecting && this.postsPage < this.totalPages) {
+                console.log('end')
+                this.fetchMorePosts()
+            }
+        };
+        let observer = new IntersectionObserver(callback, options)
+        observer.observe(this.$refs.endPage)
+    },
 }
 </script>
 
@@ -70,5 +108,8 @@ export default {
     width:35%;
     margin: 15px;
     align-self: flex-end;
+}
+.endPage {
+    height: 40px;
 }
 </style>
