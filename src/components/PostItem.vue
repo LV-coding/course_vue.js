@@ -6,7 +6,11 @@
             <div><strong>Text:</strong> {{ post.body }}</div>
         </div>
         <div class="btns">
-            <my-button class="btn-del"
+            <my-button class="btns__btn"
+            @click="$router.push(`/posts/${post.id}`)"
+            >VIEW
+            </my-button>
+            <my-button class="btns__btn"
             @click="$emit('remove', post)">
                 DELETE
             </my-button>
@@ -26,7 +30,7 @@ export default {
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .post {
     border: 2px solid purple;
     margin-top: 20px;
@@ -35,6 +39,12 @@ export default {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+.btns {
+    display: flex;
+    &__btn {
+        margin: 3px;
+    }
 }
 
 </style>
